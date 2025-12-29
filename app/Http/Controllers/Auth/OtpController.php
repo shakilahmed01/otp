@@ -72,4 +72,57 @@ class OtpController extends Controller
 
         return back()->with('status', 'A new verification code was sent.');
     }
+
+    // API: verify with JSON response
+    public function apiVerify(Request $request)
+    {
+        $request->validate([
+            'token' => ['required', 'string'],
+        ]);
+
+        $user = $request->user();
+        $token = $request->input('token');
+
+        $otp = Otp::where('user_id', $user->id)
+            ->where('token', $token)
+            ->where('used', false)
+            ->orderBy('created_at', 'desc')
+            ->first();
+
+        if (! $otp) {
+            return response()->json(['message' => 'Invalid verification code.'], 404);
+        }
+
+        if ($otp->expires_at && Carbon::now()->gt($otp->expires_at)) {
+            return response()->json(['message' => 'This verification code has expired.'], 422);
+        }
+
+        $otp->used = true;
+        $otp->save();
+
+        $user->otp_verified_at = Carbon::now();
+        $user->save();
+
+        return response()->json(['message' => 'OTP verified successfully.', 'user' => $user], 200);
+    }
+
+    // API: resend OTP with JSON response
+    public function apiResend(Request $request)
+    {
+        $user = $request->user();
+
+        $token = (string) random_int(100000, 999999);
+
+        $otp = Otp::create([
+            'user_id' => $user->id,
+            'channel' => 'email',
+            'target' => $user->email,
+            'token' => $token,
+            'expires_at' => Carbon::now()->addMinutes(10),
+        ]);
+
+        Notification::send($user, new SendOtpNotification($token));
+
+        return response()->json(['message' => 'A new verification code was sent.'], 200);
+    }
 }
