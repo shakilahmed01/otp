@@ -263,6 +263,15 @@ class PaymentController extends Controller
     /**
      * Initialize payment via API
      */
+    // {
+    //     "amount": 1000,
+    //     "currency": "BDT",
+    //     "product_name": "Test Product",
+    //     "product_category": "Test",
+    //     "cus_name": "Test User",
+    //     "cus_email": "test@example.com",
+    //     "cus_phone": "+8801712345678"
+    //   }
     public function apiInitPayment(Request $request)
     {
         $request->validate([
