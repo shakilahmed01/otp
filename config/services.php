@@ -31,4 +31,14 @@ return [
         'region' => env('AWS_DEFAULT_REGION', 'us-east-1'),
     ],
 
+    'sslcommerz' => [
+        'store_id' => env('SSLC_STORE_ID'),
+        'store_password' => env('SSLC_STORE_PASSWORD'),
+        'sandbox_mode' => env('SSLC_SANDBOX_MODE', true),
+        'success_url' => env('SSLC_SUCCESS_URL', '/payment/success'),
+        'fail_url' => env('SSLC_FAIL_URL', '/payment/fail'),
+        'cancel_url' => env('SSLC_CANCEL_URL', '/payment/cancel'),
+        'ipn_url' => env('SSLC_IPN_URL', '/payment/ipn'),
+    ],
+
 ];
